@@ -8,6 +8,7 @@ deploy:
   file_glob: true
   file: target/XMageLauncher*
   draft: true
+  skip_cleanup: true
 script: mvn package
 branches:
   except:
