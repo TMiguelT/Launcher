@@ -1,19 +1,13 @@
 language: java
 os:
-#  - linux
-  - osx
-#install:
-#  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install rpm; fi
-
-#  Push the build artifacts to the travis_build branch so we can access them
+- osx
 deploy:
-  target_branch: travis_build
-  provider: pages
-  skip_cleanup: true
-  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
-  local_dir: target
-  on:
-    branch: packaging
+  provider: releases
+  api_key:
+    secure: JvbVwi0FCfSBh+APvw5cJ6esXYh8Lu44cHKEH1rQGzBbFFzcL1pVjIB4qL1CG1uwGXWmkxoYUIklQ+pKoeqfxqiGDE9J2AwhvcI5y/2Sp7wDUEITTjlvMihTsBa6eEWcVjcqNHRRWnhgMKwW/0Qrq7jxAhP7CrMn5ZFl//OOn7YDUf9cIutz7yQ0gfhtQI8D5AfLRLtUA+9/7iJqG0MIWOT3A4Q4Qe1gHHntia0hkGnMj9ZKIDlTtEawtIM05f6a6b9t21hcaKYen9jzWCSIjUi/XAfg/lggbB7OQiVCYyV9c6+0dISeYsFBBjgeDnz5wIS1lQFTsA3Jxip7ijVOrp0yvxlOxQuieqLeVyUlcqJzuU8Z0J1lHL/b7kZtBrvIDLsMmLm/EQDIq0KmcaR0kYsQRkQ+njdaf6MUlbjKjzYBJr1/oWc153glbRrxwDTtRcRGrr2dmSO9dsBdBTaRpiXtzZ0cPKCZ7mJncPbr3QMHSPCqrpCB/BLEQLM0SmXKN5h+krGUtnE5qvS9Pbvy5wYC/LJS2iYj0YeNDlVUxGCrQ331tDe87owAzGheFTxqhN6F/F1nnBYSagntwwcJjDhRdaw9PPcEZshCPBwDkNxx5AGP2R3pRktVojmsO1XdvnEzNiZ+KdUeQrWVBT7YEr9W8sinxVughZQQRWr2ztY=
+  file_glob: true
+  file: target/XMageLauncher*
+  draft: true
 script: mvn package
 branches:
   except:
