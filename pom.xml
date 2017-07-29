@@ -101,7 +101,7 @@
                 </executions>
             </plugin>
 
-            <!--Package for Windows using the javafx bundler-->
+			<!--Package for Windows/Mac using the javafx bundler-->
             <plugin>
                 <groupId>com.zenjava</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -110,7 +110,6 @@
                     <appName>XMageLauncher</appName>
                     <nativeReleaseVersion>${version}</nativeReleaseVersion>
                     <nativeOutputDir>${project.build.directory}</nativeOutputDir>
-                    <bundler>msi</bundler>
                     <bundleArguments>
 
                         <!--Path to the license file (which we're using as a readme), relative to the additionalAppResources dir-->
