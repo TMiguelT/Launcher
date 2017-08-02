@@ -3,6 +3,8 @@ sudo: required
 os:
 - osx
 - linux
+before_install:
+- if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install rpm fakeroot; fi
 deploy:
   provider: releases
   api_key:
@@ -18,8 +20,8 @@ deploy:
     tags: true
 script: mvn package
 after_success:
-  - if [[ $TRAVIS_OS_NAME == linux ]] ; then sudo apt install target/XMageLauncher*.deb; done
-  - if [[ $TRAVIS_OS_NAME == osx ]] ; then sudo installer -pkg target/xmagelauncher*.pkg -target / ; done
+  - if [[ $TRAVIS_OS_NAME == linux ]] ; then sudo apt install target/XMageLauncher*.deb; fi
+  - if [[ $TRAVIS_OS_NAME == osx ]] ; then sudo installer -pkg target/xmagelauncher*.pkg -target / ; fi
 branches:
   except:
   - travis_build
