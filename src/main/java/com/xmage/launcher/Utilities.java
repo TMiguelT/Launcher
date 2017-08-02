@@ -11,12 +11,13 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import com.sun.xml.internal.ws.protocol.soap.VersionMismatchException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author BetaSteward
  */
 public class Utilities {
@@ -116,18 +117,34 @@ public class Utilities {
         p.destroy();
     }
 
-    private static Process launchProcess(String main, String args, String path) {
+    private static Process launchProcess(String main, String args, String path, JavaStatus javaStatus) {
+        File javaBin;
 
         File installPath = Utilities.getInstallPath();
-        File javaHome;
-        if (getOS() == OS.OSX) {
-            javaHome = new File(installPath, "/java/jre" + Config.getInstalledJavaVersion() + ".jre/Contents/Home");
-        } else {
-            javaHome = new File(installPath, "/java/jre" + Config.getInstalledJavaVersion());
-        }
-        File javaBin = new File(javaHome, "/bin/java");
         File xmagePath = new File(installPath, "/xmage/" + path);
         File classPath = new File(xmagePath, "/lib/*");
+
+        if (javaStatus == JavaStatus.LocalCompatible) {
+            //If we're supposed to use the local Java, find the relevant paths
+            File javaHome;
+            if (getOS() == OS.OSX) {
+                javaHome = new File(installPath, "/java/jre" + Config.getInstalledJavaVersion() + ".jre/Contents/Home");
+            } else {
+                javaHome = new File(installPath, "/java/jre" + Config.getInstalledJavaVersion());
+            }
+            javaBin = new File(javaHome, "/bin/java");
+        } else if (javaStatus == JavaStatus.SystemCompatible) {
+            //If we're supposed to use the system Java, find the relevant paths
+            String binDir = System.getProperty("java.home") + File.separator + "bin" + File.separator;
+            if (getOS() == OS.WIN) {
+                javaBin = new File(binDir + "java.exe");
+            } else {
+                javaBin = new File(binDir + "java");
+            }
+        } else {
+            logger.error("Attempting to run a process without a compatible Java installation");
+            return null;
+        }
 
         logger.info("Launching Process:");
         logger.info("Java bin: " + javaBin.toString());
