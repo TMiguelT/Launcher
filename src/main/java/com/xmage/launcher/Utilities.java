@@ -101,15 +101,15 @@ public class Utilities {
         return sb.toString();
     }
 
-    public static Process launchClientProcess() {
+    public static Process launchClientProcess(JavaStatus status) {
 
-        return launchProcess("mage.client.MageFrame", Config.getClientJavaOpts(), "mage-client");
+        return launchProcess("mage.client.MageFrame", Config.getClientJavaOpts(), "mage-client", status);
 
     }
 
-    public static Process launchServerProcess() {
+    public static Process launchServerProcess(JavaStatus status) {
 
-        return launchProcess("mage.server.Main", Config.getServerJavaOpts(), "mage-server");
+        return launchProcess("mage.server.Main", Config.getServerJavaOpts(), "mage-server", status);
 
     }
 
@@ -119,6 +119,7 @@ public class Utilities {
 
     private static Process launchProcess(String main, String args, String path, JavaStatus javaStatus) {
         File javaBin;
+        File javaHome;
 
         File installPath = Utilities.getInstallPath();
         File xmagePath = new File(installPath, "/xmage/" + path);
@@ -126,25 +127,19 @@ public class Utilities {
 
         if (javaStatus == JavaStatus.LocalCompatible) {
             //If we're supposed to use the local Java, find the relevant paths
-            File javaHome;
             if (getOS() == OS.OSX) {
                 javaHome = new File(installPath, "/java/jre" + Config.getInstalledJavaVersion() + ".jre/Contents/Home");
             } else {
                 javaHome = new File(installPath, "/java/jre" + Config.getInstalledJavaVersion());
             }
-            javaBin = new File(javaHome, "/bin/java");
         } else if (javaStatus == JavaStatus.SystemCompatible) {
             //If we're supposed to use the system Java, find the relevant paths
-            String binDir = System.getProperty("java.home") + File.separator + "bin" + File.separator;
-            if (getOS() == OS.WIN) {
-                javaBin = new File(binDir + "java.exe");
-            } else {
-                javaBin = new File(binDir + "java");
-            }
+            javaHome = new File(System.getProperty("java.home"));
         } else {
             logger.error("Attempting to run a process without a compatible Java installation");
             return null;
         }
+        javaBin = new File(javaHome, "/bin/java");
 
         logger.info("Launching Process:");
         logger.info("Java bin: " + javaBin.toString());

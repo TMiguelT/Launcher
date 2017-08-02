@@ -426,14 +426,14 @@ public class XMageLauncher implements Runnable {
     }
 
     private void handleClient() {
-        Process p = Utilities.launchClientProcess();
+        Process p = Utilities.launchClientProcess(javaStatus);
         clientConsole.setVisible(Config.isShowClientConsole());
         clientConsole.start(p);
     }
 
     private void handleServer() {
         if (serverProcess == null) {
-            serverProcess = Utilities.launchServerProcess();
+            serverProcess = Utilities.launchServerProcess(javaStatus);
             try {
                 int exitValue = serverProcess.exitValue();
                 logger.error("Problem during launch of server process. exit value = " + exitValue);
