@@ -23,7 +23,7 @@ deploy:
     tags: true
 script: mvn package
 after_success:
-  - if [[ $TRAVIS_OS_NAME == linux ]] ; then sudo apt install ./target/XMageLauncher*.deb; fi
+  - if [[ $TRAVIS_OS_NAME == linux ]] ; then sudo chmod a+rw ./target/XMageLauncher*.deb; sudo apt install ./target/XMageLauncher*.deb; fi
   - if [[ $TRAVIS_OS_NAME == osx ]] ; then sudo installer -pkg target/XMageLauncher*.pkg -target / ; fi
 branches:
   except:
