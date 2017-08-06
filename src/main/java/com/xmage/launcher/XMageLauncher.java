@@ -570,12 +570,12 @@ public class XMageLauncher implements Runnable {
             String systemJava = System.getProperty("java.version");
 
             // Log these versions to the user
-            textArea.append(messages.getString("java.local") + localJava + "\n");
-            textArea.append(messages.getString("java.system") + systemJava + "\n");
+            textArea.append(messages.getString("java.local") + (localJava.isEmpty() ? messages.getString("java.none") : localJava) + "\n");
+            textArea.append(messages.getString("java.system") + (systemJava.isEmpty() ? messages.getString("java.none") : systemJava) + "\n");
             textArea.append(messages.getString("java.available") + requiredJava + "\n");
 
-            // If the required Java is newer, we don't need to do anything
-            if (compareVersions(systemJava, requiredJava) > 0)
+            // Work out if we can use an existing installed Java
+            if (compareVersions(systemJava, requiredJava) >= 0)
                 javaStatus = JavaStatus.SystemCompatible;
             else if (compareVersions(localJava, requiredJava) > 0)
                 javaStatus = JavaStatus.LocalCompatible;
@@ -583,6 +583,7 @@ public class XMageLauncher implements Runnable {
                 javaStatus = JavaStatus.Incompatible;
             }
 
+            // If we can't use an existing Java, prompt the user to install it locally
             if (javaStatus == JavaStatus.Incompatible) {
                 if (localJava.isEmpty()) {
                     textArea.append(messages.getString("java.none") + "\n");
