@@ -14,7 +14,6 @@ deploy:
   - target/xmagelauncher*.rpm
   - target/XMageLauncher*.deb
   - target/XMageLauncher*.msi
-  - target/XMageLauncher*.pkg
   - target/XMageLauncher*.dmg
   - target/XMageLauncher*.jar
   draft: true
