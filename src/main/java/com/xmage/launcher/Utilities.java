@@ -100,15 +100,11 @@ public class Utilities {
     }
 
     public static Process launchClientProcess(JavaStatus status) {
-
         return launchProcess("mage.client.MageFrame", Config.getClientJavaOpts(), "mage-client", status);
-
     }
 
     public static Process launchServerProcess(JavaStatus status) {
-
         return launchProcess("mage.server.Main", Config.getServerJavaOpts(), "mage-server", status);
-
     }
 
     public static void stopProcess(Process p) {

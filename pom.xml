@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.xmage</groupId>
@@ -10,6 +11,12 @@
     <description>XMage allows you to play Magic against one or more online players or computer opponents</description>
 
     <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
@@ -53,6 +60,13 @@
             </resource>
         </resources>
         <plugins>
+
+            <!--Used for testing-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.20</version>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -115,7 +129,7 @@
                         <configuration>
                             <!--Our deb-related stuff is in src/deb-->
 
-							<deb>${project.build.directory}/${finalproject.name}.deb</deb>
+                            <deb>${project.build.directory}/${finalproject.name}.deb</deb>
 
                             <!--The control dir (which contains the .deb installer metadata) is in the control subdirectory-->
                             <controlDir>${basedir}/src/deb/control</controlDir>
@@ -125,57 +139,57 @@
                                 <!--The /opt/xmage directory is where all the xmage data (java, the client) will go.
                                     Also needs write permissions so the launcher can install the client-->
                                 <data>
-                                  <type>template</type>
-                                  <mapper>
-                                    <filemode>777</filemode>
-                                    <type>perm</type>
-                                  </mapper>
-                                  <paths>
-                                    <path>/opt/xmage</path>
-                                  </paths>
+                                    <type>template</type>
+                                    <mapper>
+                                        <filemode>777</filemode>
+                                        <type>perm</type>
+                                    </mapper>
+                                    <paths>
+                                        <path>/opt/xmage</path>
+                                    </paths>
                                 </data>
 
                                 <!--The main jar file goes in /opt/xmage-->
                                 <data>
-                                  <src>${project.build.directory}/${finalproject.name}.jar</src>
-                                  <type>file</type>
-                                  <mapper>
-                                    <filemode>775</filemode>
-                                    <type>perm</type>
-                                    <prefix>/opt/xmage</prefix>
-                                  </mapper>
+                                    <src>${project.build.directory}/${finalproject.name}.jar</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <filemode>775</filemode>
+                                        <type>perm</type>
+                                        <prefix>/opt/xmage</prefix>
+                                    </mapper>
                                 </data>
 
                                 <!--Make a symlink in the bin directory so we can run xmage from the command line-->
                                 <data>
-                                  <type>link</type>
-                                  <linkName>/usr/bin/xmage</linkName>
-                                  <linkTarget>/opt/xmage/${finalproject.name}.jar</linkTarget>
-                                  <mapper>
-                                    <type>perm</type>
-                                    <filemode>775</filemode>
-                                  </mapper>
-                                  <symlink>true</symlink>
+                                    <type>link</type>
+                                    <linkName>/usr/bin/xmage</linkName>
+                                    <linkTarget>/opt/xmage/${finalproject.name}.jar</linkTarget>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <filemode>775</filemode>
+                                    </mapper>
+                                    <symlink>true</symlink>
                                 </data>
 
                                 <!--Make a desktop file so it can be run as an application from the GUI-->
                                 <data>
-                                  <src>${basedir}/src/deb/xmage.desktop</src>
-                                  <type>file</type>
-                                  <mapper>
-                                    <type>perm</type>
-                                    <prefix>/usr/share/applications</prefix>
-                                  </mapper>
+                                    <src>${basedir}/src/deb/xmage.desktop</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/share/applications</prefix>
+                                    </mapper>
                                 </data>
 
                                 <!--Make an icon which will be used for XMage in the GUI-->
                                 <data>
-                                  <src>${basedir}/src/main/resources/icon-mage-flashed.png</src>
-                                  <type>file</type>
-                                  <mapper>
-                                    <type>perm</type>
-                                    <prefix>/usr/share/pixmaps</prefix>
-                                  </mapper>
+                                    <src>${basedir}/src/main/resources/icon-mage-flashed.png</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/share/pixmaps</prefix>
+                                    </mapper>
                                 </data>
 
                             </dataSet>
@@ -184,7 +198,7 @@
                 </executions>
             </plugin>
 
-			<!--Package for Windows/Mac using the javafx bundler-->
+            <!--Package for Windows/Mac using the javafx bundler-->
             <plugin>
                 <groupId>com.zenjava</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -200,7 +214,7 @@
                         <!-- <additionalAppResources>src/main/resources</additionalAppResources> -->
 
                         <!--Don't package the runtime, since we'll install our own Java later on-->
-						<!--<runtime />-->
+                        <!--<runtime />-->
                     </bundleArguments>
                     <vendor>XMage</vendor>
                     <mainClass>com.xmage.launcher.XMageLauncher</mainClass>
@@ -231,7 +245,9 @@
     <repositories>
         <repository>
             <id>unknown-jars-temp-repo</id>
-            <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
+            <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please
+                replace the dependencies in this repository with correct ones and delete this repository.
+            </name>
             <url>file:${project.basedir}/lib</url>
         </repository>
     </repositories>

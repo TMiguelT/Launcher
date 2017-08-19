@@ -45,6 +45,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
 import javax.swing.text.DefaultCaret;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,13 +67,39 @@ enum JavaStatus {
     /**
      * We need to download a new Java to run XMage
      */
-    Incompatible
+    Incompatible;
+
+    /**
+     * Gets a JavaStatus from a list of Java version strings
+     */
+    public static JavaStatus getStatus(String systemJava, String requiredJava, String localJava) {
+        return getStatus(
+                new DefaultArtifactVersion(systemJava),
+                new DefaultArtifactVersion(requiredJava),
+                new DefaultArtifactVersion(localJava)
+        );
+    }
+
+    /**
+     * Gets a JavaStatus from a list of Java versions
+     */
+    public static JavaStatus getStatus(ArtifactVersion systemJava, ArtifactVersion requiredJava, ArtifactVersion localJava) {
+        // Work out if we can use an existing installed Java
+        if (systemJava.compareTo(requiredJava) >= 0)
+            return JavaStatus.SystemCompatible;
+        else if (localJava.compareTo(requiredJava) > 0)
+            return JavaStatus.LocalCompatible;
+        else {
+            return JavaStatus.Incompatible;
+        }
+    }
 }
 
 /**
  * @author BetaSteward
  */
 public class XMageLauncher implements Runnable {
+
 
     private static final Logger logger = LoggerFactory.getLogger(XMageLauncher.class);
 
@@ -108,6 +135,13 @@ public class XMageLauncher implements Runnable {
     private boolean newXMage = false;
     private boolean noXMage = false;
     private boolean downgradeXMage = false;
+
+    /**
+     * True if we need to upgrade Java, otherwise false
+     */
+    private boolean noJava() {
+        return javaStatus == JavaStatus.Incompatible;
+    }
 
     private XMageLauncher() {
         setDefaultFonts();
@@ -459,7 +493,7 @@ public class XMageLauncher implements Runnable {
         checkXMage(true); // handle branch changes
 
         // If everything is fine, only ask for a force update
-        if (javaStatus != JavaStatus.Incompatible && !newXMage) {
+        if (!noJava() && !newXMage) {
             int response = JOptionPane.showConfirmDialog(frame, messages.getString("force.update.message"), messages.getString("force.update.title"), JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
                 UpdateTask update = new UpdateTask(progressBar, true);
@@ -574,17 +608,11 @@ public class XMageLauncher implements Runnable {
             textArea.append(messages.getString("java.system") + (systemJava.isEmpty() ? messages.getString("java.none") : systemJava) + "\n");
             textArea.append(messages.getString("java.available") + requiredJava + "\n");
 
-            // Work out if we can use an existing installed Java
-            if (compareVersions(systemJava, requiredJava) >= 0)
-                javaStatus = JavaStatus.SystemCompatible;
-            else if (compareVersions(localJava, requiredJava) > 0)
-                javaStatus = JavaStatus.LocalCompatible;
-            else {
-                javaStatus = JavaStatus.Incompatible;
-            }
+            // Work out if our Java version is okay
+            javaStatus = JavaStatus.getStatus(systemJava, requiredJava, localJava);
 
             // If we can't use an existing Java, prompt the user to install it locally
-            if (javaStatus == JavaStatus.Incompatible) {
+            if (noJava()) {
                 if (localJava.isEmpty()) {
                     textArea.append(messages.getString("java.none") + "\n");
                     JOptionPane.showMessageDialog(
@@ -632,7 +660,7 @@ public class XMageLauncher implements Runnable {
                     xmageMessage = messages.getString("xmage.new.message");
                     xmageTitle = messages.getString("xmage.new");
                 }
-                if (!silent && javaStatus != JavaStatus.Incompatible && !noXMage) {
+                if (!silent && !noJava() && !noXMage) {
                     JOptionPane.showMessageDialog(frame, xmageMessage, xmageTitle, JOptionPane.INFORMATION_MESSAGE);
                 }
             }
@@ -645,7 +673,7 @@ public class XMageLauncher implements Runnable {
     }
 
     private void enableButtons() {
-        if (javaStatus != JavaStatus.Incompatible && !noXMage) {
+        if (!noJava() && !noXMage) {
             btnLaunchClient.setEnabled(true);
             btnLaunchClient.setForeground(Color.BLACK);
             btnLaunchClientServer.setEnabled(true);
@@ -729,7 +757,7 @@ public class XMageLauncher implements Runnable {
         @Override
         public void done() {
             checkUpdates();
-            if (javaStatus == JavaStatus.Incompatible && noXMage) {
+            if (noJava() && noXMage) {
                 UpdateTask update = new UpdateTask(progressBar, false);
                 update.execute();
             }
@@ -748,7 +776,7 @@ public class XMageLauncher implements Runnable {
 
         @Override
         protected Void doInBackground() {
-            if (!downgradeXMage && (force || javaStatus == JavaStatus.Incompatible)) { // only update java on force update to the same version
+            if (!downgradeXMage && (force || noJava())) { // only update java on force update to the same version
                 updateJava();
             }
             if (force || noXMage || newXMage) {
@@ -967,7 +995,7 @@ public class XMageLauncher implements Runnable {
 
     }
 
-    private int compareVersions(String ver1, String ver2) {
+    private static int compareVersions(String ver1, String ver2) {
         DefaultArtifactVersion version1 = new DefaultArtifactVersion(ver1);
         DefaultArtifactVersion version2 = new DefaultArtifactVersion(ver2);
         return version1.compareTo(version2);
