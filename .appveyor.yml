@@ -1,5 +1,8 @@
-build_script:
-  mvn package
+build_script: mvn package
 artifacts:
-  - path: target/XMageLauncher*.msi
+  - path: target\*.msi
     name: Windows Installer
+
+# The unit-tests are run as part of the mvn package build script, so we only need to test the installation here
+test_script:
+  - for %%x in (targets\*.msi) do msiexec.exe /a "%%x"
