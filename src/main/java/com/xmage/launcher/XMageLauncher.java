@@ -87,7 +87,7 @@ enum JavaStatus {
         // Work out if we can use an existing installed Java
         if (systemJava.compareTo(requiredJava) >= 0)
             return JavaStatus.SystemCompatible;
-        else if (localJava.compareTo(requiredJava) > 0)
+        else if (localJava.compareTo(requiredJava) >= 0)
             return JavaStatus.LocalCompatible;
         else {
             return JavaStatus.Incompatible;
