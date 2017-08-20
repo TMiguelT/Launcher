@@ -1,3 +1,6 @@
+# Get connection details
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 build_script: set PATH=%PATH%;%WIX% && mvn package
 artifacts:
   - path: target\*.msi
@@ -6,3 +9,7 @@ artifacts:
 # The unit-tests are run as part of the mvn package build script, so we only need to test the installation here
 test_script:
   - for %%x in (target\*.msi) do msiexec.exe /a "%%x"
+
+# Allow remote connection to debug build
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
