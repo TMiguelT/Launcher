@@ -214,7 +214,7 @@
                         <!-- <additionalAppResources>src/main/resources</additionalAppResources> -->
 
                         <!--Don't package the runtime, since we'll install our own Java later on-->
-                        <!--<runtime />-->
+                        <runtime />
                     </bundleArguments>
                     <vendor>XMage</vendor>
                     <mainClass>com.xmage.launcher.XMageLauncher</mainClass>
