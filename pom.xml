@@ -208,6 +208,7 @@
                     <nativeReleaseVersion>${version}</nativeReleaseVersion>
                     <nativeOutputDir>${project.build.directory}</nativeOutputDir>
                     <bundleArguments>
+						<systemWide>true</systemWide>
 
                         <!--Path to the license file (which we're using as a readme), relative to the additionalAppResources dir-->
                         <!-- <licenseFile>readme.txt</licenseFile> -->
